@@ -8,6 +8,7 @@ import org.auth.api.infrastructure.model.UserModel;
 import org.auth.api.infrastructure.payload.UserRecordDTO;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService implements UserDetailsService {
     private final UserGatewayImpl gateway;
     private final HelperMapper mapper;
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Transactional
     public UserRecordDTO create(UserRecordDTO userRecordDTO) {
@@ -23,7 +25,7 @@ public class UserService implements UserDetailsService {
                 new User(
                         null,
                         userRecordDTO.username(),
-                        userRecordDTO.password(),
+                        encoder.encode(userRecordDTO.password()),
                         userRecordDTO.roles()
                 )
         );

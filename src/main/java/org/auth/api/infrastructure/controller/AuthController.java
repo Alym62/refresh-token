@@ -20,6 +20,12 @@ public class AuthController {
     private final UserService service;
     private final AuthenticationManager manager;
 
+    @PostMapping("/create")
+    public ResponseEntity<UserRecordDTO> create(@RequestBody UserRecordDTO dto) {
+        var user = service.create(dto);
+        return ResponseEntity.ok().body(user);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserRecordDTO dto) {
         manager.authenticate(new UsernamePasswordAuthenticationToken(dto.username(), dto.password()));

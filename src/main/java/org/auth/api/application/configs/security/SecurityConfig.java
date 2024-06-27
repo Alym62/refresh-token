@@ -46,8 +46,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint))
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/user/create").permitAll()
-                        .requestMatchers("/api/v1/user/fetch").hasAuthority(Role.ADMIN.getDescription())
+                        .requestMatchers("/api/v1/user/**").hasAuthority(Role.ADMIN.getDescription())
                         .anyRequest().authenticated())
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();
