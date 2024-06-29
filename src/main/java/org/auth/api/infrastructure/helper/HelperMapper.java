@@ -4,18 +4,19 @@ import lombok.AllArgsConstructor;
 import org.auth.api.core.entity.User;
 import org.auth.api.infrastructure.model.UserModel;
 import org.auth.api.infrastructure.payload.UserRecordDTO;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
 public class HelperMapper {
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public User recordToEntityCore(UserRecordDTO dto) {
         return new User(
                 null,
                 dto.username(),
-                dto.password(),
+                encoder.encode(dto.password()),
                 dto.roles()
         );
     }
@@ -39,10 +40,11 @@ public class HelperMapper {
     }
 
     public UserRecordDTO entityCoreToRecord(User user) {
-        return new UserRecordDTO(
-                user.getUsername(),
-                user.getPassword(),
-                user.getRoles()
-        );
+        return UserRecordDTO
+                .builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .roles(user.getRoles())
+                .build();
     }
 }

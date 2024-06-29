@@ -3,34 +3,28 @@ package org.auth.api.application.services;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
-import org.auth.api.core.entity.User;
 import org.auth.api.infrastructure.model.UserModel;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.HashMap;
 
 @Service
 public class JwtService {
-    private static final String JWT_SECRET = "W+jX#P9o2}40%#J#7e[qGZ)Ps1g6A5@>PVSoDIH+ls87zrd(Z$";
-    private static final Integer EXPIRES_IN = 599;
+    @Value("${auth.jwt.token.secret}")
+    private String JWT_SECRET;
 
-    public HashMap<String, Object> generateToken(UserModel user) {
+    public String generateToken(UserModel user, Integer expiration) {
         var algorithm = generateAlgorithm();
 
-        var token = generateConstructorJwt()
+        return generateConstructorJwt()
                 .withIssuer("auth-api")
                 .withSubject(user.getUsername())
-                .withExpiresAt(getTimeExpiration())
+                .withExpiresAt(getTimeExpiration(expiration))
                 .sign(algorithm);
 
-        var response = new HashMap<String, Object>();
-        response.put("token", token);
-        response.put("expires_in", getTimeExpiration());
-
-        return response;
     }
 
     public String extractUser(String jwtToken) {
@@ -51,7 +45,9 @@ public class JwtService {
         return JWT.create();
     }
 
-    private Instant getTimeExpiration() {
-        return LocalDateTime.now().plusSeconds(EXPIRES_IN).toInstant(ZoneOffset.of("-03:00"));
+    private Instant getTimeExpiration(Integer expiration) {
+        return LocalDateTime.now()
+                .plusSeconds(expiration)
+                .toInstant(ZoneOffset.of("-03:00"));
     }
 }
